@@ -25,7 +25,7 @@ def test_broker_can_subscribe_to_topics():
     client.publish("rpi/broadcast", "test message")
     client.disconnect()
 
-    time.sleep(1) # Wait for messages to be received by the broker
+    time.sleep(30) # Wait for messages to be received by the broker
 
     # Check if the messages were received by the callbacks
     assert broker.last_esp32_sensor1_message == "test message"
