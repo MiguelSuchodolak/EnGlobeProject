@@ -12,8 +12,7 @@ class MQTTBroker:
         # Assigning callback methods to handle various MQTT events
         self.client.on_connect = self.on_connect
         self.client.on_disconnect = self.on_disconnect
-        self.client.message_callback_add('esp32/sensor1', self.callback_esp32_sensor1)
-        self.client.message_callback_add('esp32/sensor2', self.callback_esp32_sensor2)
+        self.client.message_callback_add('esp32/#', self.callback_esp32_client) 
         self.client.message_callback_add('rpi/broadcast', self.callback_rpi_broadcast)
 
     # Method to handle the MQTT 'on_connect' event
@@ -30,13 +29,9 @@ class MQTTBroker:
         # Printing a message on disconnection
         print("Disconnected from MQTT server")
 
-    # Callback method to handle the MQTT messages on 'esp32/sensor1' topic
-    def callback_esp32_sensor1(self, client, userdata, msg):
-        print('ESP sensor1 data: ', msg.payload.decode('utf-8'))
-
-    # Callback method to handle the MQTT messages on 'esp32/sensor2' topic
-    def callback_esp32_sensor2(self, client, userdata, msg):
-        print('ESP sensor2 data: ', str(msg.payload.decode('utf-8')))
+    # Callback method to handle the MQTT messages on 'esp32/#' topic
+    def callback_esp32_client(self, client, userdata, msg):
+        print(msg.topic, msg.payload.decode('utf-8'))
 
     # Callback method to handle the MQTT messages on 'rpi/broadcast' topic
     def callback_rpi_broadcast(self, client, userdata, msg):
