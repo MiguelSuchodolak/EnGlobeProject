@@ -20,7 +20,7 @@ class JsonManager():
                 my_json.seek(0)
                 json.dump(jsonFile, my_json, indent=4)
         except Exception:    
-            print("File does not exist, creating json files")
+            #print("File does not exist, creating json files")
             self.createJSON(filepath)
             self.writeJSON(filepath, dataToWrite)
 
