@@ -35,7 +35,7 @@ class MQTTBroker:
 
     # Callback method to handle the MQTT messages on 'rpi/broadcast' topic
     def callback_rpi_broadcast(self, client, userdata, msg):
-        print('RPi Broadcast message:  ', str(msg.payload.decode('utf-8')))
+        print('RPi Broadcast message:  ', msg.payload.decode('utf-8'))
 
     # Method to subscribe to the relevant MQTT topics
     def client_subscriptions(self, client):

@@ -1,11 +1,9 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 
-// Replace the SSID/Password details as per your wifi router
-const char* ssid = "yourSSID";
-const char* password = "yourPassword";
-const char* nameESP = "yourNameForThisESP32";
-// Replace your MQTT Broker IP address here:
+
+const char* ssid = "Suchodolak2.4";
+const char* password = "Doismaisdois2";
 const char* mqtt_server = "192.168.15.11";
 
 WiFiClient espClient;
@@ -25,6 +23,7 @@ void blink_led(unsigned int times, unsigned int duration){
 }
 
 void setup_wifi() {
+  WiFi.mode(WIFI_STA);
   delay(50);
   Serial.println();
   Serial.print("Connecting to ");
@@ -52,6 +51,7 @@ void setup_wifi() {
 
 void connect_mqttServer() {
   // Loop until we're reconnected
+  WiFi.mode(WIFI_STA);
   while (!client.connected()) {
 
         //first check if connected to wifi
@@ -63,7 +63,7 @@ void connect_mqttServer() {
         //now attemt to connect to MQTT server
         Serial.print("Attempting MQTT connection...");
         // Attempt to connect
-        if (client.connect("ESP32_client2")) { // Change the name of client here if multiple ESP32 are connected
+        if (client.connect("ESP32_client1")) { // Change the name of client here if multiple ESP32 are connected
           //attempt successful
           Serial.println("connected");
           // Subscribe to topics here
@@ -100,7 +100,7 @@ void callback(char* topic, byte* message, unsigned int length) {
 
   // Check if a message is received on the topic "rpi/broadcast"
   if (String(topic) == "rpi/broadcast") {
-      if(messageTemp == "15"){
+      if(messageTemp == "10"){
         Serial.println("Action: blink LED");
         blink_led(1,1250); //blink LED once (for 1250ms ON time)
       }
@@ -112,14 +112,14 @@ void callback(char* topic, byte* message, unsigned int length) {
 void setup() {
   pinMode(ledPin, OUTPUT);
   Serial.begin(115200);
-
+  WiFi.mode(WIFI_STA);
   setup_wifi();
   client.setServer(mqtt_server,1883);//1883 is the default port for MQTT server
   client.setCallback(callback);
 }
 
 void loop() {
-  
+  WiFi.mode(WIFI_STA);
   if (!client.connected()) {
     connect_mqttServer();
   }
@@ -130,7 +130,7 @@ void loop() {
   if (now - lastMsg > 4000) {
     lastMsg = now;
 
-    client.publish("esp32/sensor2", "37"); //topic name (to which this ESP32 publishes its data). 37 is the dummy value.
+    client.publish("esp32/sensor1", "88"); //topic name (to which this ESP32 publishes its data). 88 is the dummy value.
     
   }
   
