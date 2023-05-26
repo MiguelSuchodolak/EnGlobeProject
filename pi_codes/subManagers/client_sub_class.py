@@ -62,7 +62,7 @@ if __name__ == "__main__":
     # Creating an instance of MQTTBroker class with name "rpi_client1"
     broker = MQTTBroker("rpi_client1")
     # Connecting to the MQTT broker with host IP address '127.0.0.1' and port number 1883
-    broker.connect('127.0.0.1', 1883)
+    broker.connect('192.168.229.13', 1883)
 
     # Loop to keep checking the MQTT server connection status
     while True:
