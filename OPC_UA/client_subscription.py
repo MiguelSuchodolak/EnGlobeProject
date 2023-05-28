@@ -16,7 +16,7 @@ data_variables = ["Flowmeter_sensor", "Pressure_sensor", "Temperature_sensor"]
 class SubHandler(object):
     """
     Subscription Handler. To receive events from server for a subscription
-        FOR PROSYS SIMULATOR NEEDS TO BE HERE
+    Prosys Simulator
     """
     def datachange_notification(self, node, val, data):
         print("Python: New data change event", node, val)
@@ -29,7 +29,7 @@ async def main():
     client1 = paho.Client("Local")
     client1.on_publish = on_publish
     client1.connect(broker,port)
-    url = "opc.tcp://192.168.229.206:53530/OPCUA/SimulationServer/"
+    url = "opc.tcp://192.168.2.100:53530/OPCUA/SimulationServer/"
     async with Client(url=url) as client:
         nsidx = await client.get_namespace_index("enGlobe_test")
         var_flow = await client.nodes.root.get_child(["0:Objects", f"{nsidx}:enGlobe_test","{}:{}".format(nsidx, "Flowmeter_sensor")])
@@ -42,9 +42,10 @@ async def main():
             var_pressure,
             var_temp,
         ]
+        print(var_flow)
         await subscription.subscribe_data_change(nodes)
         stop_event =  asyncio.Event()
-        await stop_event_wait()
+        await stop_event.wait()
   #      await asyncio.sleep(10)
 
 if __name__ == "__main__":
