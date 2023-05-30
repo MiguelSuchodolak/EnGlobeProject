@@ -63,7 +63,7 @@ class SubHandler(object):
 
 
 async def main():
-    url = "opc.tcp://192.168.2.100:53530/OPCUA/SimulationServer/"
+    url = "opc.tcp://192.168.2.101:53530/OPCUA/SimulationServer/"
     async with Client(url=url) as client:
         nsidx = await client.get_namespace_index("enGlobe_test")
         var_flow = await client.nodes.root.get_child(["0:Objects", f"{nsidx}:enGlobe_test","{}:{}".format(nsidx, "Flowmeter_sensor")])
