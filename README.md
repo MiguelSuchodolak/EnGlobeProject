@@ -17,6 +17,7 @@ The EnGlobeProject is an ESP32-based system designed to collect readings from va
 7. [Troubleshooting](#troubleshooting)
 8. [Contributing](#contributing)
 9. [License](#license)
+10.[Handling the Pi](#handling-the-Pi)
 
 
 ## Description
@@ -172,4 +173,60 @@ Contributions to the EnGlobeProject are welcome! If you have any improvements, b
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file in the project root for more information.
+
+## Handling the Pi
+
+Headless 32-bit image
+
+#Requiriments:
+
+Docker container running a mosquitto broker inside (friendly reminder to update the .config to add the lines:
+allow_anonymous true and listenes 1883)
+
+#What is happening on the Pi?
+
+The Local Broker is the key point to exchange the data. 
+There is a MQTTpubsub.py
+
+Based on it, there are three differente cases:
+
+1. Data comming from the ESP32 (sensors) and going to the Termica Broker 
+
+2. Data comming from a PLC and going to the Termica Broker
+
+3. Getting data from the ESP32 (sensors) and writing it to a PLC
+
+In cases 1 and 2, data is being publish via MQTT to two different topics on the Broker:
+esp32/# and plc/#. The esp32 publishing part 
+
+To get this data from the Local Broker and send to Termica Broker, there is a script called 
+mqttClientServer.py inside the folder pi_codes. The requirements of this code is the paho.mqtt 
+python library installed on your enviroment, saving that, no change should be necessary.
+
+To simulate the data comming from the PLC the program Prosys OPC UA Simulator is needed.
+Inside, a folder enGlobe_test should be created and the following variables:
+
+- Flowmeter_sensor
+- Pressure_sensor
+- Temperature_sensor
+
+Inside the folder OPC_UA there is a script called OPC_client_subscription.py responsiable for 
+getting data from the simulator and sending to the pi Local Broker.
+
+Inside this script is necessary to identify the IP of the machine where the simulator is running.
+
+After having all the enviroments and right network IPs the codes are ready to run.
+
+#Some hints
+
+Please remember that the Broker IP Addr is the same as the machine running the broker (no need 
+if you use "localhost" in the codes)
+
+To check the connection with Termica Broker, open a new terminal in a machine with the right 
+mqtt-client packages installed (the pi will also do) and run:
+
+$mosquitto_sub -h 3.16.161.137 -t "#" -u "data" -P "datapasswd"
+
+To subscribe to all the topics
+
 
