@@ -209,6 +209,8 @@ Inside, a folder enGlobe_test should be created and the following variables:
 - Flowmeter_sensor
 - Pressure_sensor
 - Temperature_sensor
+- 
+![image](https://github.com/MiguelSuchodolak/EnGlobeProject/assets/44625759/02895890-5951-4e20-b5cc-0e830ace59f5)
 
 Inside the folder OPC_UA there is a script called OPC_client_subscription.py responsiable for 
 getting data from the simulator and sending to the pi Local Broker.
