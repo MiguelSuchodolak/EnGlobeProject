@@ -138,6 +138,11 @@ This project requires the following software tools:
 2. PlatformIO IDE extension for Visual Studio Code
 3. Git
 4. GitHub extension for Visual Studio Code to view the printed messages and debug information.
+5. Docker: Install Docker on your Raspberry Pi to run a Mosquitto broker. Make sure to update the Mosquitto configuration file with the following lines:
+6. Prosys OPC UA Simulation Server: This software is used to simulate a Programmable Logic Controller (PLC) and generate data that can be sent to the local MQTT broker. Set up the simulator with a folder named `enGlobe_test` and include the following variables:
+- `Flowmeter_sensor`
+- `Pressure_sensor`
+- `Temperature_sensor`
 
 ## Raspberry Pi Setup and Operation
 
