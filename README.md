@@ -126,8 +126,8 @@ The following hardware components are required for this project:
 
 ## Required Software
 
-- Visual Studio Code
-- PlatformIO IDE extension for VS Code
+- [Visual Studio Code](https://code.visualstudio.com/): The code editor used for this project.
+- [PlatformIO for VSCode](https://platformio.org/install/ide?install=vscode): An extension for VSCode that makes it easy to develop for the ESP32 and other microcontrollers.
 
 ## Software Setup
 
@@ -162,6 +162,29 @@ To compile, upload, and run the project on your ESP32, follow these steps:
 2. Click on the Extensions button on the left sidebar or press `Ctrl+Shift+X` to open the Extensions pane.
 3. Search for "PlatformIO".
 4. Click on the Install button next to "PlatformIO IDE".
+
+#### Locating Main Code Files
+
+The main code files are located in the `src` directory of your PlatformIO project. 
+
+#### Setting the Baud Rate for the Serial Monitor
+
+1. Open your `platformio.ini` file.
+2. Locate the line with `monitor_speed`(sometimes you need to add this line).
+3. Set the value to the desired baud rate. For example, `monitor_speed = 115200` sets the baud rate to 115200.
+
+#### Compiling the Code
+
+1. Open the PlatformIO home.
+2. Navigate to your project.
+3. Click on the "Build" button (check mark icon).
+
+#### Viewing the Serial Monitor 
+
+1. Ensure your ESP32 is connected to your computer.
+2. Open the PlatformIO home.
+3. Navigate to your project.
+4. Click on the "Serial Monitor" button (plug icon).
 
 ### Git Installation
 
@@ -224,61 +247,49 @@ Contributions to the EnGlobeProject are welcome! If you have any improvements, b
 
 This project is licensed under the MIT License. See the LICENSE file in the project root for more information.
 
-## Handling the Pi
+## Raspberry Pi Setup and Operation
 
-Headless 32-bit image
+This section explains how to handle the Raspberry Pi with a headless 32-bit image and the use of a Docker container.
 
-#Requiriments:
+### Requirements:
 
-Docker container running a mosquitto broker inside (friendly reminder to update the .config to add the lines:
-allow_anonymous true and listenes 1883)
+- Docker container running a Mosquitto broker. Remember to update the Mosquitto configuration file with these lines:
+```
+allow_anonymous true
+listener 1883
+```
 
-#What is happening on the Pi?
+### Overview of the Raspberry Pi Operations:
 
-The Local Broker is the key point to exchange the data. 
-There is a MQTTpubsub.py
+The local broker in the Raspberry Pi is a key point for data exchange, and there is a `MQTTpubsub.py` script which orchestrates it. Based on this script, there are three different cases:
 
-Based on it, there are three differente cases:
+1. Data coming from the ESP32 (sensors) and going to the Termica Broker.
+2. Data coming from a Programmable Logic Controller (PLC) and going to the Termica Broker.
+3. Data from the ESP32 (sensors) being written to a PLC.
 
-1. Data comming from the ESP32 (sensors) and going to the Termica Broker 
+In cases 1 and 2, data is being published via MQTT to two different topics on the broker: `esp32/#` and `plc/#`. 
 
-2. Data comming from a PLC and going to the Termica Broker
+To get this data from the Local Broker and send it to Termica Broker, there is a script called `mqttClientServer.py` inside the `pi_codes` folder. The requirements of this script is the `paho.mqtt` Python library installed on your environment. Other than that, no changes should be necessary.
 
-3. Getting data from the ESP32 (sensors) and writing it to a PLC
+To simulate the data coming from the PLC, the Prosys OPC UA Simulator is needed. Inside the simulator, a folder `enGlobe_test` should be created and include the following variables:
 
-In cases 1 and 2, data is being publish via MQTT to two different topics on the Broker:
-esp32/# and plc/#. The esp32 publishing part 
+- `Flowmeter_sensor`
+- `Pressure_sensor`
+- `Temperature_sensor`
 
-To get this data from the Local Broker and send to Termica Broker, there is a script called 
-mqttClientServer.py inside the folder pi_codes. The requirements of this code is the paho.mqtt 
-python library installed on your enviroment, saving that, no change should be necessary.
+![Simulator Image](https://github.com/MiguelSuchodolak/EnGlobeProject/assets/44625759/02895890-5951-4e20-b5cc-0e830ace59f5)
 
-To simulate the data comming from the PLC the program Prosys OPC UA Simulator is needed.
-Inside, a folder enGlobe_test should be created and the following variables:
+Inside the `OPC_UA` folder, there is a script called `OPC_client_subscription.py` responsible for getting data from the simulator and sending it to the Pi's local broker. 
 
-- Flowmeter_sensor
-- Pressure_sensor
-- Temperature_sensor
-- 
-![image](https://github.com/MiguelSuchodolak/EnGlobeProject/assets/44625759/02895890-5951-4e20-b5cc-0e830ace59f5)
+In this script, it is necessary to identify the IP of the machine where the simulator is running. After setting up all the environments and ensuring the correct network IPs, the codes are ready to run.
 
-Inside the folder OPC_UA there is a script called OPC_client_subscription.py responsiable for 
-getting data from the simulator and sending to the pi Local Broker.
+### Useful Tips
 
-Inside this script is necessary to identify the IP of the machine where the simulator is running.
+- The broker IP address is the same as the machine running the broker (you can also use "localhost" in the codes).
+- To check the connection with the Termica Broker, open a new terminal in a machine with the correct mqtt-client packages installed (the Pi will also do), and run the following command:
 
-After having all the enviroments and right network IPs the codes are ready to run.
+```bash
+mosquitto_sub -h 3.16.161.137 -t "#" -u "data" -P "datapasswd"
+```
 
-#Some hints
-
-Please remember that the Broker IP Addr is the same as the machine running the broker (no need 
-if you use "localhost" in the codes)
-
-To check the connection with Termica Broker, open a new terminal in a machine with the right 
-mqtt-client packages installed (the pi will also do) and run:
-
-$mosquitto_sub -h 3.16.161.137 -t "#" -u "data" -P "datapasswd"
-
-To subscribe to all the topics
-
-
+This command subscribes to all the topics on the broker.
