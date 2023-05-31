@@ -4,6 +4,8 @@
 
 The EnGlobeProject is an ESP32-based system designed to collect readings from various sensors and publish these readings to an MQTT broker. This project is suitable for monitoring environmental conditions or as a starting point for more complex IoT setups.
 
+![Example Image](Comunication_blocks.png)
+
 ## Table of Contents
 
 1. [Description](#description)
@@ -41,6 +43,8 @@ The following hardware components are required for this project:
 2. Two INA219 Current Sensor modules
 3. One Temperature Sensor (Please replace with your specific model)
 4. DS1302 Real-Time Clock (RTC) module
+
+![Example Image](Hardware_diagram.png)
 
 ### ESP32 Connections
 
