@@ -37,9 +37,11 @@ This project utilizes the following hardware components:
 
 1. **ESP32:** This is the microcontroller running the main code. It communicates with all sensors and modules and sends the sensor data via MQTT. ![ESP32](Images/ESP32.jpg)
 2. **INA219 Bi-directional DC Current/Power Monitor Modules:** Two of these modules are used in this project to monitor power and current. They are connected to the ESP32 via the I2C interface. Be sure to connect VCC to 3.3V, GND to GND, SDA to GPIO21 (or the GPIO you have defined as SDA), and SCL to GPIO22 (or the GPIO you have defined as SCL).![INA219](Images/INA219.jpg).
-3. **Temperature Sensor: LM35** This sensor is used to measure the temperature. Connect its data pin to the appropriate GPIO pin on the ESP32 as defined in your code.
-4. **DS1302 Real Time Clock (RTC) Module:** This module provides accurate timekeeping for timestamping the sensor data. Connect the CLK, DAT, and RST pins of the DS1302 module to the GPIO pins defined in your code, and VCC and GND to the power supply.
-5. **Button**.
+3. **Temperature Sensor: LM35** This sensor is used to measure the temperature. Connect its data pin to the appropriate GPIO pin on the ESP32 as defined in your code.   ![LM35](Images/LM35.jpg)
+4. **DS1302 Real Time Clock (RTC) Module:** This module provides accurate timekeeping for timestamping the sensor data. Connect the CLK, DAT, and RST pins of the DS1302 module to the GPIO pins defined in your code, and VCC and GND to the power supply.  ![DS1302](Images/DS1302.jpg)
+5. **Button**. 
+
+![Button](Images/Button.jpg)
 
 Please ensure all your wiring connections are secure and correct to prevent any malfunctioning or damage to your devices. If you're not using a breadboard or PCB for your project, it's a good idea to use a multimeter to check that your connections are correct before powering up the ESP32.
 
@@ -97,32 +99,30 @@ The following hardware components are required for this project:
 
 ![Example Image](Hardware_diagram.png)
 
-### ESP32 Connections
-
-- Connect the LED to the GPIO 2 on the ESP32.
-- Connect the interruption input to GPIO 12 on the ESP32.
-
 ### INA219 Current Sensor Module Connections
 
-- Connect the INA219 modules to the I2C pins on the ESP32. 
-- SCL pin 22
-- SDA pin 21
-- Make sure the power (VCC 3.3v) and ground (GND) pins are also connected.
+- Connect the INA219 modules to the I2C pins on the ESP32.
+- SCL pin **22**
+- SDA pin **21**
+- Make sure the power (VCC **3.3v**) and ground (**GND**) pins are also connected.
 
 ### Temperature Sensor Connections
 
-- Connect your specific temperature sensor to the appropriate pins on the ESP32, pin 39(somethimes called VN.)
+- Connect your specific temperature sensor to the appropriate pins on the ESP32, pin **39** (sometimes called VN).
+- Make sure the power (VCC **3.3v**) and ground (**GND**) pins are also connected.
 
 ### DS1302 Real-Time Clock (RTC) Module Connections
 
 - Connect the DS1302 RTC module to the SPI pins on the ESP32. This typically involves connecting the MOSI, MISO, and SCK.
-- CLK pin 32.
-- DAT pin 26.
-- RST pin 27.
-- Make sure the power (VCC 3.3v) and ground (GND) pins are also connected.
+- CLK pin **32**.
+- DAT pin **26**.
+- RST pin **27**.
+- Make sure the power (VCC **3.3v**) and ground (**GND**) pins are also connected.
 
-### Button 
-- Connect the **button** in GND and Pin 13.
+### Button
+
+- Connect the **button** in **GND** and Pin **13**.
+
 
 ## Required Software
 
