@@ -6,7 +6,7 @@ The EnGlobeProject is a robust, ESP32-based IoT solution designed to gather and 
 
 This project is structured to provide a clear understanding of the hardware-software interaction, enhancing its maintainability and scalability. It is well-suited for applications requiring real-time monitoring of multiple environmental parameters.
 
-![Example Image](Comunication_blocks.png)
+![Logic Block Diagram](Comunication_blocks.png)
 
 ## Table of Contents
 
@@ -53,10 +53,14 @@ The I2C interface of the INA219 is used for communication with the ESP32. I2C, o
 
 Each INA219 board must be assigned a unique I2C address. The I2C base address for each board is 0x40. The binary address that you program with the address jumpers is added to the base I2C address. Here is the addressing scheme:
 
+![ina219](https://cdn-learn.adafruit.com/assets/assets/000/002/458/original/adafruit_products_2012_10_25_IMG_0721-1024.jpg?1396783305) 
+
 - Board 0: Address = 0x40 Offset = binary 00000 (no jumpers required)
 - Board 1: Address = 0x41 Offset = binary 00001 (bridge A0 as in the photo above)
 - Board 2: Address = 0x44 Offset = binary 00100 (bridge A1)
 - Board 3: Address = 0x45 Offset = binary 00101 (bridge A0 & A1)
+
+The information was obtained from this [website](https://learn.adafruit.com/adafruit-ina219-current-sensor-breakout/assembly).
 
 Here is the complete INA219 I2C Address table:
 
