@@ -199,8 +199,6 @@ This command subscribes to all the topics on the broker.
 2. Download the version of Visual Studio Code suitable for your operating system.
 3. Run the downloaded file and follow the installation prompts.
 
-###quote("## Software Setup\n\nThis project", "Visual Studio Code\n\n1. Visit the [official Visual Studio Code download page](https://code.visualstudio.com/download).\n2. Download the version of Visual Studio Code suitable for your operating system.\n3. Run the downloaded file and follow the installation prompts.")
-
 ### PlatformIO IDE Extension Installation
 
 1. Open Visual Studio Code.
