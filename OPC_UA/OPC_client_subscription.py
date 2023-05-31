@@ -1,7 +1,7 @@
 # This code publish data from the PLC to the local Broker running at the RPI 
-import asyncio
-import logging
 from datetime import datetime
+import asyncio 
+import logging
 from asyncua import Client
 import paho.mqtt.client as paho
 from paho.mqtt import client as mqtt_client
@@ -9,7 +9,7 @@ from paho.mqtt import client as mqtt_client
 broker = "localhost"
 port = 1883
 
-topic_PLC_data = "sensors/PLC/"
+topic_PLC_data = "plc/1"
 
 data_variables = ["Flowmeter_sensor", "Pressure_sensor", "Temperature_sensor"]
 
@@ -32,24 +32,33 @@ def on_publish(client, userdata, result):
 class SubHandler(object):
     """
     Subscription Handler. To receive events from server for a subscription
-        FOR PROSYS SIMULATOR NEEDS TO BE HERE
     """
 
     def __init__(self, nodes):
         self.nodes = nodes 
     
-    def datachange_notification(self, node, val, data):
+    async def datachange_notification(self, node, val, data):
         print("Python: New data change event", node, val)
         if(node == self.nodes[0]): #change in the flowmeter, send to the Broker
 
-            #Trata mensagem, msg_sub ----> msg_pub MESMO FORMATO QUE O ESP MANDA
-
             client = connect_mqtt() #connected with Termica broker
             client.loop_start()
-            msg_pub = '{"id" : "entry_box", "temperature" : 1, "pressure" : 5, "flow": 4, "battery_voltage":16, "timestamp": 1}'
 
-            result = client.publish(topic= topic_PLC_data, payload = msg_pub.encode('utf-8'), qos=2) #qos garante zero perda
-            client.loop(timeout=10)           
+            flow = float(await self.nodes[0].get_value())
+            pressure = float(await self.nodes[1].get_value())
+            temp = float(await self.nodes[2].get_value())
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            msg_pub = {"id" : "PLC/1",
+                      "temperature" : temp,
+                      "pressure" : pressure,
+                      "flow": flow,
+                      "timestamp": current_time
+                      }
+
+            result = client.publish(topic= topic_PLC_data, payload = str(msg_pub), qos=2) 
+            client.loop(timeout=2)
+
             if result[0] == 0:
                 print(f"Message published successfully to topic on Local Broker")
             else:
@@ -63,20 +72,17 @@ class SubHandler(object):
 
 
 async def main():
-    url = "opc.tcp://192.168.2.101:53530/OPCUA/SimulationServer/"
+    url = "opc.tcp://192.168.239.206:53530/OPCUA/SimulationServer/" #Change IP according to the computer running the Simulator Prosys
     async with Client(url=url) as client:
         nsidx = await client.get_namespace_index("enGlobe_test")
         var_flow = await client.nodes.root.get_child(["0:Objects", f"{nsidx}:enGlobe_test","{}:{}".format(nsidx, "Flowmeter_sensor")])
         var_pressure = await client.nodes.root.get_child(["0:Objects", f"{nsidx}:enGlobe_test", "{}:{}".format(nsidx, "Pressure_sensor")])
         var_temp = await client.nodes.root.get_child(["0:Objects", f"{nsidx}:enGlobe_test", "{}:{}".format(nsidx, "Temperature_sensor")])
-       # subscription = await client.create_subscription(500,handler)
         nodes = [
             var_flow,
             var_pressure,
             var_temp,
         ]
-        
-#        handler = SubHandler(nodes)
         handler = SubHandler(nodes)
         subscription = await client.create_subscription(500,handler)
         await subscription.subscribe_data_change(nodes)
