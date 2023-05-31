@@ -2,7 +2,9 @@
 
 ## Project Overview
 
-The EnGlobeProject is an ESP32-based system designed to collect readings from various sensors and publish these readings to an MQTT broker. This project is suitable for monitoring environmental conditions or as a starting point for more complex IoT setups.
+The EnGlobeProject is a robust, ESP32-based IoT solution designed to gather and process data from various sensors, including power/current monitoring modules and temperature sensors. It leverages the power of MQTT protocol to efficiently publish sensor readings to an MQTT broker. This project can serve as a sophisticated environment monitoring system or as a foundation for more intricate IoT applications. It also features real-time clock capabilities for precise timestamping of sensor data, and a user-input button for additional functionality.
+
+This project is structured to provide a clear understanding of the hardware-software interaction, enhancing its maintainability and scalability. It is well-suited for applications requiring real-time monitoring of multiple environmental parameters.
 
 ![Example Image](Comunication_blocks.png)
 
