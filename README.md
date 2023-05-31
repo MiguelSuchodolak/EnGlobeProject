@@ -16,11 +16,12 @@ This project is structured to provide a clear understanding of the hardware-soft
 4. [Hardware Setup](#hardware-setup)
 5. [Required Software](#required-software)
 6. [Software Setup](#software-setup)
-7. [Running the Project](#running-the-project)
-8. [Troubleshooting](#troubleshooting)
-9. [Contributing](#contributing)
-10. [License](#license)
-11. [Handling the Pi](#handling-the-Pi)
+7. [Handling the Pi](#handling-the-Pi)
+8. [Running the Project](#running-the-project)
+9. [Troubleshooting](#troubleshooting)
+10. [Contributing](#contributing)
+11. [License](#license)
+
 
 
 ## Description
@@ -138,6 +139,53 @@ This project requires the following software tools:
 3. Git
 4. GitHub extension for Visual Studio Code to view the printed messages and debug information.
 
+## Raspberry Pi Setup and Operation
+
+This section explains how to handle the Raspberry Pi with a headless 32-bit image and the use of a Docker container.
+
+### Requirements:
+
+- Docker container running a Mosquitto broker. Remember to update the Mosquitto configuration file with these lines:
+```
+allow_anonymous true
+listener 1883
+```
+
+### Overview of the Raspberry Pi Operations:
+
+The local broker in the Raspberry Pi is a key point for data exchange, and there is a `MQTTpubsub.py` script which orchestrates it. Based on this script, there are three different cases:
+
+1. Data coming from the ESP32 (sensors) and going to the Termica Broker.
+2. Data coming from a Programmable Logic Controller (PLC) and going to the Termica Broker.
+3. Data from the ESP32 (sensors) being written to a PLC.
+
+In cases 1 and 2, data is being published via MQTT to two different topics on the broker: `esp32/#` and `plc/#`. 
+
+To get this data from the Local Broker and send it to Termica Broker, there is a script called `mqttClientServer.py` inside the `pi_codes` folder. The requirements of this script is the `paho.mqtt` Python library installed on your environment. Other than that, no changes should be necessary.
+
+To simulate the data coming from the PLC, the Prosys OPC UA Simulator is needed. Inside the simulator, a folder `enGlobe_test` should be created and include the following variables:
+
+- `Flowmeter_sensor`
+- `Pressure_sensor`
+- `Temperature_sensor`
+
+![Simulator Image](https://github.com/MiguelSuchodolak/EnGlobeProject/assets/44625759/02895890-5951-4e20-b5cc-0e830ace59f5)
+
+Inside the `OPC_UA` folder, there is a script called `OPC_client_subscription.py` responsible for getting data from the simulator and sending it to the Pi's local broker. 
+
+In this script, it is necessary to identify the IP of the machine where the simulator is running. After setting up all the environments and ensuring the correct network IPs, the codes are ready to run.
+
+### Useful Tips
+
+- The broker IP address is the same as the machine running the broker (you can also use "localhost" in the codes).
+- To check the connection with the Termica Broker, open a new terminal in a machine with the correct mqtt-client packages installed (the Pi will also do), and run the following command:
+
+```bash
+mosquitto_sub -h 3.16.161.137 -t "#" -u "data" -P "datapasswd"
+```
+
+This command subscribes to all the topics on the broker.
+
 ## Running the Project
 
 To compile, upload, and run the project on your ESP32, follow these steps:
@@ -245,51 +293,6 @@ Contributions to the EnGlobeProject are welcome! If you have any improvements, b
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file in the project root for more information.
 
-## Raspberry Pi Setup and Operation
 
-This section explains how to handle the Raspberry Pi with a headless 32-bit image and the use of a Docker container.
 
-### Requirements:
-
-- Docker container running a Mosquitto broker. Remember to update the Mosquitto configuration file with these lines:
-```
-allow_anonymous true
-listener 1883
-```
-
-### Overview of the Raspberry Pi Operations:
-
-The local broker in the Raspberry Pi is a key point for data exchange, and there is a `MQTTpubsub.py` script which orchestrates it. Based on this script, there are three different cases:
-
-1. Data coming from the ESP32 (sensors) and going to the Termica Broker.
-2. Data coming from a Programmable Logic Controller (PLC) and going to the Termica Broker.
-3. Data from the ESP32 (sensors) being written to a PLC.
-
-In cases 1 and 2, data is being published via MQTT to two different topics on the broker: `esp32/#` and `plc/#`. 
-
-To get this data from the Local Broker and send it to Termica Broker, there is a script called `mqttClientServer.py` inside the `pi_codes` folder. The requirements of this script is the `paho.mqtt` Python library installed on your environment. Other than that, no changes should be necessary.
-
-To simulate the data coming from the PLC, the Prosys OPC UA Simulator is needed. Inside the simulator, a folder `enGlobe_test` should be created and include the following variables:
-
-- `Flowmeter_sensor`
-- `Pressure_sensor`
-- `Temperature_sensor`
-
-![Simulator Image](https://github.com/MiguelSuchodolak/EnGlobeProject/assets/44625759/02895890-5951-4e20-b5cc-0e830ace59f5)
-
-Inside the `OPC_UA` folder, there is a script called `OPC_client_subscription.py` responsible for getting data from the simulator and sending it to the Pi's local broker. 
-
-In this script, it is necessary to identify the IP of the machine where the simulator is running. After setting up all the environments and ensuring the correct network IPs, the codes are ready to run.
-
-### Useful Tips
-
-- The broker IP address is the same as the machine running the broker (you can also use "localhost" in the codes).
-- To check the connection with the Termica Broker, open a new terminal in a machine with the correct mqtt-client packages installed (the Pi will also do), and run the following command:
-
-```bash
-mosquitto_sub -h 3.16.161.137 -t "#" -u "data" -P "datapasswd"
-```
-
-This command subscribes to all the topics on the broker.
