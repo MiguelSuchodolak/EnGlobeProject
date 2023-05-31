@@ -12,14 +12,15 @@ This project is structured to provide a clear understanding of the hardware-soft
 
 1. [Description](#description)
 2. [Hardware Requirements](#hardware-requirements)
-3. [Hardware Setup](#hardware-setup)
-4. [Required Software](#required-software)
-5. [Software Setup](#software-setup)
-6. [Running the Project](#running-the-project)
-7. [Troubleshooting](#troubleshooting)
-8. [Contributing](#contributing)
-9. [License](#license)
-10.[Handling the Pi](#handling-the-Pi)
+3. [Understanding the INA219 and I2C](#Understanding-the-INA219-and-I2C)
+4. [Hardware Setup](#hardware-setup)
+5. [Required Software](#required-software)
+6. [Software Setup](#software-setup)
+7. [Running the Project](#running-the-project)
+8. [Troubleshooting](#troubleshooting)
+9. [Contributing](#contributing)
+10. [License](#license)
+11. [Handling the Pi](#handling-the-Pi)
 
 
 ## Description
@@ -41,6 +42,45 @@ This project utilizes the following hardware components:
 5. **Button**.
 
 Please ensure all your wiring connections are secure and correct to prevent any malfunctioning or damage to your devices. If you're not using a breadboard or PCB for your project, it's a good idea to use a multimeter to check that your connections are correct before powering up the ESP32.
+
+## Understanding the INA219 and I2C
+
+The INA219 is a high-side current shunt and power monitor with an I2C interface. It's used in this project to measure power and current. The INA219 monitors both shunt drop and supply voltage, allowing you to calculate power usage. This module has a programmable calibration register, allowing for a wide range of currents to be measured.
+
+The I2C interface of the INA219 is used for communication with the ESP32. I2C, or Inter-Integrated Circuit, is a multi-master, multi-slave, packet-switched, single-ended, serial computer bus. It allows multiple devices to be connected to the ESP32's I2C bus, each with a unique address recognized by the ESP32.
+
+### I2C Addressing
+
+Each INA219 board must be assigned a unique I2C address. The I2C base address for each board is 0x40. The binary address that you program with the address jumpers is added to the base I2C address. Here is the addressing scheme:
+
+- Board 0: Address = 0x40 Offset = binary 00000 (no jumpers required)
+- Board 1: Address = 0x41 Offset = binary 00001 (bridge A0 as in the photo above)
+- Board 2: Address = 0x44 Offset = binary 00100 (bridge A1)
+- Board 3: Address = 0x45 Offset = binary 00101 (bridge A0 & A1)
+
+Here is the complete INA219 I2C Address table:
+
+| A1 | A0 | Slave Address |
+| --- | --- | --- |
+| GND | GND | 1000000 |
+| GND | V S+ | 1000001 |
+| GND | SDA | 1000010 |
+| GND | SCL | 1000011 |
+| V S+ | GND | 1000100 |
+| V S+ | V S+ | 1000101 |
+| V S+ | SDA | 1000110 |
+| V S+ | SCL | 1000111 |
+| SDA | GND | 1001000 |
+| SDA | V S+ | 1001001 |
+| SDA | SDA | 1001010 |
+| SDA | SCL | 1001011 |
+| SCL | GND | 1001100 |
+| SCL | V S+ | 1001101 |
+| SCL | SDA | 1001110 |
+| SCL | SCL | 1001111 |
+
+Please refer to the [INA219 datasheet](https://www.ti.com/lit/ds/symlink/ina219.pdf?ts=1631885952561&ref_url=https%253A%252F%252Fwww.google.com%252F) for more detailed information on I2C addressing and how to set up and use the INA219 module.
+
 
 ## Hardware Setup
 
