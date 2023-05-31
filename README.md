@@ -37,7 +37,7 @@ This project utilizes the following hardware components:
 
 1. **ESP32:** This is the microcontroller running the main code. It communicates with all sensors and modules and sends the sensor data via MQTT.
 2. **INA219 Bi-directional DC Current/Power Monitor Modules:** Two of these modules are used in this project to monitor power and current. They are connected to the ESP32 via the I2C interface. Be sure to connect VCC to 3.3V, GND to GND, SDA to GPIO21 (or the GPIO you have defined as SDA), and SCL to GPIO22 (or the GPIO you have defined as SCL).
-3. **Temperature Sensor:** This sensor is used to measure the temperature. Connect its data pin to the appropriate GPIO pin on the ESP32 as defined in your code.
+3. **Temperature Sensor: LM35** This sensor is used to measure the temperature. Connect its data pin to the appropriate GPIO pin on the ESP32 as defined in your code.
 4. **DS1302 Real Time Clock (RTC) Module:** This module provides accurate timekeeping for timestamping the sensor data. Connect the CLK, DAT, and RST pins of the DS1302 module to the GPIO pins defined in your code, and VCC and GND to the power supply.
 5. **Button**.
 
@@ -88,7 +88,7 @@ The following hardware components are required for this project:
 
 1. ESP32 development board
 2. Two INA219 Current Sensor modules
-3. One Temperature Sensor (Please replace with your specific model)
+3. One Temperature Sensor LM35
 4. DS1302 Real-Time Clock (RTC) module
 
 ![Example Image](Hardware_diagram.png)
