@@ -242,7 +242,7 @@ The main code files are located in the `src` directory of your PlatformIO projec
 3. Search for "GitHub".
 4. Click on the Install button next to "GitHub".
 
-####To compile, upload, and run the project on your ESP32, follow these steps:
+#### To compile, upload, and run the project on your ESP32, follow these steps:
 
 1. Open the main project file in PlatformIO.
 2. Click on the checkmark icon in the lower toolbar to compile the code. Ensure there are no errors reported in the console.
