@@ -1,14 +1,14 @@
 #include <mqtt_handler.h>
 
 // Wi-Fi and MQTT configuration
-const char* ssid = "Anna"; // Wi-Fi SSID
-const char* password = "anna11011"; // Wi-Fi password
-const char* mqtt_server = "192.168.67.219"; // MQTT broker server address
+const char* ssid = "GalaxyS21"; // Wi-Fi SSID
+const char* password = "gabi1234"; // Wi-Fi password
+const char* mqtt_server = "192.168.114.219"; // MQTT broker server address
 const char *mqtt_topic = "esp32/1"; // MQTT topic
 
 AsyncMqttClient mqttClient; // MQTT client instance
 TimerHandle_t mqttReconnectTimer; // Timer for MQTT reconnection
-TimerHandle_t wifiReconnectTimer; // Timer for Wi-Fi reconnection
+TimerHandle_t wifiReconnectTimer; // Timer for Wi-Fi reconnection 
 
 void setupWifiAndMqttClient(){
   // Create timers for MQTT and Wi-Fi reconnection
