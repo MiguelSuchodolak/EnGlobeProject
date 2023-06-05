@@ -15,8 +15,9 @@ TERMICA_BROKER = "3.16.161.137"
 #Default port for MQTT
 TERMICA_PORT = 1883
 
-#Topic to subscribe from, data comming from the ESP32 with sensors data
-topic = "esp32/1"
+#Topic to subscribe from, data comming from the ESP32 + PLC
+topic_esp = "esp32/#"
+topic_plc = "plc/#"
 #Topic to publish on Termica broker
 topic_termica = "oven"
 
@@ -26,7 +27,7 @@ client_id_RPI = "RPI_PublishMode"
 
 #Function that creates clients 
 #Used to create the local client connect to the Local Broker and the client connected with Termica Broker 
-def connect_mqtt(broker_id, client_id, broker, port) -> mqtt_client:
+def connect_mqtt(broker_id, client_id, broker, port):
     def on_connect(client, userdata, flags, rc, broker_id):
         if rc == 0:
             print(f"Connected to {broker_id}!")
@@ -49,22 +50,20 @@ def connect_mqtt(broker_id, client_id, broker, port) -> mqtt_client:
 def subscribe(client_local: mqtt_client):
     def on_message(client, userdata, msg):
         print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
-        # recebe e envia para broker da termica
 
-        #Trata mensagem, msg_sub ----> msg_pub
         client_termica = connect_mqtt("Termica Broker", client_id_RPI, TERMICA_BROKER, TERMICA_PORT) #connected with Termica broker
-       #msg_pub = '{"id" : "entry_box", "temperature" : 1, "pressure" : 5, "flow": 4, "battery_voltage":16, "timestamp": 1}'
-
-        result = client_termica.publish(topic= topic_termica, payload = msg.encode('utf-8'), qos=2) #qos garante zero perda
-
+        client_termica.loop_start()
+        result = client_termica.publish(topic= topic_termica, payload = msg.payload, qos=2) 
+        client_termica.loop(timeout=2)
         if result[0] == 0:
             print(f"Message published successfully to topic {topic_termica} on Termica Broker")
         else:
             print(f"Failed to publish message to topic {topic_termica} on Termica Broker")
-
+        client_termica.loop_stop()
         client_termica.disconnect()  #Connects and disconnects every time new message arrives
 
-    client_local.subscribe(topic)
+    client_local.subscribe(topic_esp)
+    client_local.subscribe(topic_plc)
     client_local.on_message = on_message
 
 def run():
