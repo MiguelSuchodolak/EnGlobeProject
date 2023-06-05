@@ -1,9 +1,9 @@
 #include <mqtt_handler.h>
 
 // Wi-Fi and MQTT configuration
-const char* ssid = "GalaxyS21"; // Wi-Fi SSID
-const char* password = "gabi1234"; // Wi-Fi password
-const char* mqtt_server = "192.168.114.219"; // MQTT broker server address
+const char* ssid = "SSID"; // Wi-Fi SSID
+const char* password = "PASSWORD"; // Wi-Fi password
+const char* mqtt_server = "IP_OF_RASPI_PI"; // MQTT broker server address
 const char *mqtt_topic = "esp32/1"; // MQTT topic
 
 AsyncMqttClient mqttClient; // MQTT client instance
