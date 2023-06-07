@@ -1,14 +1,15 @@
 #include <mqtt_handler.h>
 
 // Wi-Fi and MQTT configuration
-const char* ssid = "SSID"; // Wi-Fi SSID
-const char* password = "PASSWORD"; // Wi-Fi password
-const char* mqtt_server = "IP_OF_RASPI_PI"; // MQTT broker server address
-const char *mqtt_topic = "esp32/1"; // MQTT topic
+const char* ssid = "Suchodolak2.4"; // Wi-Fi SSID
+const char* password = "Doismaisdois2"; // Wi-Fi password
+const char* mqtt_server = "192.168.15.11"; // MQTT broker server address
+const char* mqtt_topic = "esp32/1"; // MQTT topic
 
 AsyncMqttClient mqttClient; // MQTT client instance
 TimerHandle_t mqttReconnectTimer; // Timer for MQTT reconnection
 TimerHandle_t wifiReconnectTimer; // Timer for Wi-Fi reconnection 
+SemaphoreHandle_t mutex = xSemaphoreCreateMutex();
 
 void setupWifiAndMqttClient(){
   // Create timers for MQTT and Wi-Fi reconnection
@@ -71,7 +72,21 @@ void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
 }
 
 void onMqttPublish(uint16_t packetId) {
+  xSemaphoreTake(mutex, portMAX_DELAY);
   Serial.print("Publish acknowledged.");
   Serial.print("  packetId: ");
-  Serial.println(packetId);
+  Serial.print(packetId);
+
+  String filename = GetAFileName(SD, "/");
+  filename = "/" + filename;
+  deleteFile(SD, filename.c_str());
+  
+  filename = GetAFileName(SD, "/");
+  if( filename != ERROR_OPENING_FILE ){
+    FLAG_DATA_TO_SEND = 1;
+  }
+  else{
+    FLAG_DATA_TO_SEND = 0;
+  }
+  xSemaphoreGive(mutex);
 }

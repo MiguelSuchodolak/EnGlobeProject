@@ -1,18 +1,15 @@
 #include <main.h>
 
 // Variables
-int last_msg = 0; // Timestamp of the last message sent
-int interruption_counter = 0; // Counter for the number of interruptions
 int last_interrupt = 0; // Timestamp of the last interrupt
-
 int FLAG_INTERRUPT = 0; // Flag to indicate if an interrupt occurred
+int FLAG_DATA_TO_SEND = 0;
 
 // Interrupt Service Routine for the test interrupt
 void IRAM_ATTR interrupt_test(){
   if ( (millis() - last_interrupt) >= TIMEOUT_INTERRUPTION ){
-    interruption_counter++; // Increment the interruption counter
     last_interrupt = millis(); // Update the timestamp of the last interrupt
-    FLAG_INTERRUPT = 0; // Set the interrupt flag to indicate an interrupt occurred
+    FLAG_INTERRUPT = 1; // Set the interrupt flag to indicate an interrupt occurred
   }
 }
  
@@ -29,8 +26,9 @@ void setup() {
 }
 
 void loop() {
-  delay(3000);
-  if ( FLAG_INTERRUPT == 0 ) { // Check if an interrupt occurred
+
+  xSemaphoreTake(mutex, portMAX_DELAY);
+  if ( FLAG_INTERRUPT == 1 ) { // Check if an interrupt occurred
     String BatteryVoltage  = readBatteryVoltage(); 
     String BatteryTemperature = readBatteryTemperature(); 
     String FurnacePressure =  readFurnacePressure();
@@ -46,20 +44,28 @@ void loop() {
                                     FurnaceFlow, 
                                     Date_Time);
 
-    last_msg = millis(); // Update the timestamp of the last message sent
-    uint16_t packetIdPub1 = mqttClient.publish(mqtt_topic, 2, true, message.c_str()); // Publish the message to the MQTT broker at QoS 2
-    
-    if( packetIdPub1 ){
-      Serial.printf("Publishing on topic %s at QoS 2, packetId: %i ", mqtt_topic, packetIdPub1); // Print the MQTT publishing details to the serial monitor
-      Serial.print('\n');
-      Serial.println(message);
-    }
-    else{
-      //Save message on flash memory
-      Serial.println("Failed to publish message to MQTT broker, Saving on SD Card");
-      appendFile(SD, "/data.txt", message.c_str());
+    std::replace( Date_Time.begin(), Date_Time.end() , '/', '-' );
+    std::replace( Date_Time.begin(), Date_Time.end() , ' ', '_' );
+    std::replace( Date_Time.begin(), Date_Time.end() , ':', '-' );
+    String filename = "/"+ Date_Time + ".txt";
 
-    }
-    FLAG_INTERRUPT = 0; // Reset the interrupt flag
+    writeFile(SD,filename.c_str(),message.c_str());
+
+    FLAG_DATA_TO_SEND = 1;
+
+    FLAG_INTERRUPT = 0;
   }
+  xSemaphoreGive(mutex);
+
+  xSemaphoreTake(mutex, portMAX_DELAY);
+  if( FLAG_DATA_TO_SEND == 1 ){
+    String filename = GetAFileName(SD, "/");
+    if( filename != ERROR_OPENING_FILE && filename != "/"){
+      filename = "/" + filename;
+      String message = GetReadFromFile(SD, filename.c_str());
+      mqttClient.publish(mqtt_topic, 2, true, message.c_str()); // Publish the message to the MQTT broker at QoS 2
+    }
+    FLAG_DATA_TO_SEND = 0;
+  }
+  xSemaphoreGive(mutex);
 }
