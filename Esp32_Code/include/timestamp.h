@@ -13,5 +13,6 @@ extern RtcDS1302<ThreeWire> Rtc; // Declare an external RTC object
 
 void setupTimestamp(); // Function declaration for setting up the timestamp
 String Get_Date_Time(); // Function declaration for getting the date and time
+String Get_Date_Time_File_Name();
 
 #endif

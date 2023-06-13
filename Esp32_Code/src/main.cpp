@@ -15,14 +15,17 @@ void IRAM_ATTR interrupt_test(){
  
 void setup() {
   Serial.begin(115200); // Initialize the serial communication
+  
   pinMode(LED_PIN, OUTPUT); // Set the LED pin as an output
   pinMode(INTERRUPTION_PIN, INPUT_PULLUP); // Set the interruption pin as an input with internal pull-up resistor
+
   attachInterrupt(INTERRUPTION_PIN, interrupt_test, RISING); // Attach the interrupt_test function to the interrupt pin for rising edge detection
   setupWifiAndMqttClient(); // Setup Wi-Fi and MQTT client
   setupTimestamp(); // Setup timestamp functionality
-  //setupSensors(); // Setup sensor functionality (commented out)
+  setupSensors(); // Setup sensor functionality (commented out)
   setupSdCard();
-  //delay(5000);
+    
+  delay(5000);
 }
 
 void loop() {
@@ -33,39 +36,23 @@ void loop() {
     String BatteryTemperature = readBatteryTemperature(); 
     String FurnacePressure =  readFurnacePressure();
     String FurnaceTemperature =  readFurnaceTemperature(); 
-    String FurnaceFlow = readFurnaceFlow();
-    String Date_Time = Get_Date_Time();
+    String DateTimeFileName = Get_Date_Time_File_Name();
 
     // Format the message using sensor readings and timestamp
     String message = formatMessage( BatteryVoltage, 
                                     BatteryTemperature, 
                                     FurnacePressure,
                                     FurnaceTemperature, 
-                                    FurnaceFlow, 
-                                    Date_Time);
+                                    DateTimeFileName);
 
-    std::replace( Date_Time.begin(), Date_Time.end() , '/', '-' );
-    std::replace( Date_Time.begin(), Date_Time.end() , ' ', '_' );
-    std::replace( Date_Time.begin(), Date_Time.end() , ':', '-' );
-    String filename = "/"+ Date_Time + ".txt";
+    std::replace( DateTimeFileName.begin(), DateTimeFileName.end() , '/', '-' );
+    std::replace( DateTimeFileName.begin(), DateTimeFileName.end() , ' ', '_' );
+    std::replace( DateTimeFileName.begin(), DateTimeFileName.end() , ':', '-' );
+    String filename = "/"+ DateTimeFileName + ".txt";
 
     writeFile(SD,filename.c_str(),message.c_str());
-
-    FLAG_DATA_TO_SEND = 1;
-
+    SendMqttMessage();
     FLAG_INTERRUPT = 0;
-  }
-  xSemaphoreGive(mutex);
-
-  xSemaphoreTake(mutex, portMAX_DELAY);
-  if( FLAG_DATA_TO_SEND == 1 ){
-    String filename = GetAFileName(SD, "/");
-    if( filename != ERROR_OPENING_FILE && filename != "/"){
-      filename = "/" + filename;
-      String message = GetReadFromFile(SD, filename.c_str());
-      mqttClient.publish(mqtt_topic, 2, true, message.c_str()); // Publish the message to the MQTT broker at QoS 2
-    }
-    FLAG_DATA_TO_SEND = 0;
   }
   xSemaphoreGive(mutex);
 }

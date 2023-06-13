@@ -16,4 +16,4 @@ void deleteFile(fs::FS &fs, const char * path);
 
 const char* GetAFileName(fs::FS &fs, const char *path);
 
-const char* GetReadFromFile(fs::FS &fs, const char * path);
+String GetReadFromFile(fs::FS &fs, const char * path);

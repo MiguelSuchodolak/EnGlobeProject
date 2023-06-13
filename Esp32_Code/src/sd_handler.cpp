@@ -30,7 +30,7 @@ void setupSdCard(){
 }
 
 void writeFile(fs::FS &fs, const char * path, const char * message){
-    Serial.printf("Writing file: %s\n", path);
+    Serial.printf("Writing file: %s ", path);
 
     File file = fs.open(path, FILE_WRITE);
     if(!file){
@@ -38,7 +38,7 @@ void writeFile(fs::FS &fs, const char * path, const char * message){
         return;
     }
     if(file.print(message)){
-
+        Serial.println("File written");
     } else {
         Serial.println("Write failed");
     }
@@ -46,9 +46,9 @@ void writeFile(fs::FS &fs, const char * path, const char * message){
 }
 
 void deleteFile(fs::FS &fs, const char * path){
-    Serial.printf(" Deleting file: %s\n", path);
+    Serial.printf(" Deleting file: %s ", path);
     if(fs.remove(path)){
-
+        Serial.println(" File Deleted");
     } else {
         Serial.println(" Delete failed");
     }
@@ -77,20 +77,28 @@ const char* GetAFileName(fs::FS &fs, const char * path){
     return ERROR_OPENING_FILE;
 }
 
-const char* GetReadFromFile(fs::FS &fs, const char * path){
+void readFile(fs::FS &fs, const char * path){
+    Serial.printf("Reading file: %s\n", path);
+
+    File file = fs.open(path);
+    if(!file){
+        Serial.println("Failed to open file for reading");
+        return;
+    }
+
+    Serial.print("Read from file: ");
+    while(file.available()){
+        Serial.write(file.read());
+    }
+    file.close();
+}
+
+String GetReadFromFile(fs::FS &fs, const char * path){
     if( path != ERROR_OPENING_FILE ){
-
         File file = fs.open(path);
-        std::vector<char> char_vet;
-        
-        while(file.available()){
-            char_vet.push_back(file.read());
+        if( file ){
+            return file.readString();
         }
-        file.close();
-
-        std::string msgg(char_vet.begin(), char_vet.end());
-        return msgg.c_str();
-
     }
     else{
         Serial.print( "No files in SD" );

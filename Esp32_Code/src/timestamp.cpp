@@ -13,10 +13,27 @@ void setupTimestamp(){
     if(!Rtc.GetIsRunning()) Rtc.SetIsRunning(true); // Start the RTC if not already running
 
     RtcDateTime now = Rtc.GetDateTime(); // Get the current date and time from the RTC
-    Rtc.SetDateTime(compiled); // Set the RTC's date and time to the compiled timestamp if it's earlier
+    
+    if(now < compiled) Rtc.SetDateTime(compiled); // Set the RTC's date and time to the compiled timestamp if it's earlier
 }
 
 String Get_Date_Time(){
+    RtcDateTime now = Rtc.GetDateTime(); // Get the current date and time from the RTC
+    char datestring[20]; // Variable to store the formatted date and time string
+
+    snprintf_P(datestring, 
+            countof(datestring),
+            PSTR("%02u/%02u/%04u %02u:%02u:%02u"), // Format of the displayed information
+            now.Day(), // Day
+            now.Month(), // Month
+            now.Year(), // Year
+            now.Hour(), // Hour
+            now.Minute(), // Minutes
+            now.Second() ); // Seconds
+    return String(datestring); // Return the formatted date and time string
+}
+
+String Get_Date_Time_File_Name(){
     RtcDateTime now = Rtc.GetDateTime(); // Get the current date and time from the RTC
     char datestring[20]; // Variable to store the formatted date and time string
 

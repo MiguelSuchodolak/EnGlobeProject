@@ -40,5 +40,5 @@ void onMqttPublish(uint16_t packetId);
 
 void setupWifiAndMqttClient();
 // Function to set up the Wi-Fi and MQTT client
-
+void SendMqttMessage();
 #endif
