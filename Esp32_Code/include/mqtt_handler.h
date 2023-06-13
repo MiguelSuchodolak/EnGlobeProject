@@ -18,7 +18,6 @@ extern SemaphoreHandle_t mutex;
 extern AsyncMqttClient mqttClient; // Declaration of the MQTT client object
 extern TimerHandle_t mqttReconnectTimer; // Declaration of the MQTT reconnect timer object
 extern TimerHandle_t wifiReconnectTimer; // Declaration of the Wi-Fi reconnect timer object
-extern int FLAG_DATA_TO_SEND;
 
 void connectToWifi();
 // Function to connect to the Wi-Fi network

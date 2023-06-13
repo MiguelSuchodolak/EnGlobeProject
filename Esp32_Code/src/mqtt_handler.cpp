@@ -12,50 +12,36 @@ TimerHandle_t wifiReconnectTimer; // Timer for Wi-Fi reconnection
 SemaphoreHandle_t mutex = xSemaphoreCreateMutex();
 
 void setupWifiAndMqttClient(){
-  // Create timers for MQTT and Wi-Fi reconnection
-  wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0, reinterpret_cast<TimerCallbackFunction_t>(connectToWifi));
-  mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
-
-  WiFi.mode(WIFI_STA); //init wifi mode
-  WiFi.onEvent(WiFiEvent);
   connectToWifi();
-
   // Set up MQTT event handlers
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);
   mqttClient.onPublish(onMqttPublish);
   mqttClient.setServer(mqtt_server, 1883);
+
 }
 
 void connectToWifi() {
   Serial.println("Connecting to Wi-Fi...");
+  WiFi.mode(WIFI_STA); //init wifi mode
+  WiFi.onEvent(WiFiEvent);
   WiFi.begin(ssid, password);
 }
 
 void connectToMqtt() {
-  Serial.println("Connecting to MQTT...");
-  mqttClient.connect();
+  if( ! mqttClient.connected() ){
+    Serial.println("Connecting to MQTT...");
+    mqttClient.connect();
+  }
 }
 
 void WiFiEvent(WiFiEvent_t event) {
   Serial.printf("[WiFi-event] event: %d\n", event);
-  switch(event) {
-    case SYSTEM_EVENT_STA_GOT_IP:
+    if( event == SYSTEM_EVENT_STA_GOT_IP){
       Serial.println("WiFi connected");
       Serial.println("IP address: ");
       Serial.println(WiFi.localIP());
       connectToMqtt(); // Connect to MQTT after getting an IP address
-      break;
-    case SYSTEM_EVENT_STA_DISCONNECTED:
-      Serial.println("WiFi lost connection");
-      if( WiFi.localIP().toString() == "0.0.0.0"){
-        xTimerStop(mqttReconnectTimer, 0);
-        xTimerStart(wifiReconnectTimer, 0); // Start Wi-Fi reconnection timer
-      }
-      else{
-        xTimerStart(mqttReconnectTimer, 0);
-      }
-      break;
   }
 }
 
@@ -67,14 +53,11 @@ void onMqttConnect(bool sessionPresent) {
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
   Serial.println("Disconnected from MQTT.");
-  xTimerStart(mqttReconnectTimer, 0); // Start MQTT reconnection if Wi-Fi is still connected
 }
 
 void onMqttPublish(uint16_t packetId) {
   xSemaphoreTake(mutex, portMAX_DELAY);
   Serial.print("Publish acknowledged.");
-  Serial.print("  packetId: ");
-  Serial.print(packetId);
 
   String filename = GetAFileName(SD, "/");
   filename = "/" + filename;

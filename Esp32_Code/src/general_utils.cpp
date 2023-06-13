@@ -19,10 +19,10 @@ String formatMessage(String batteryVoltage,
 
   String formattedMessage = "{"; // Start the message string with an opening brace
   String mqtt_name("esp32/1"); // MQTT name
-  String test = "4";
+  String test = "17";
 
   formattedMessage += "\"Id\": \""+ mqtt_name + "\","; // Add MQTT name to the message as an "Id" field
-  formattedMessage += "\"BatteryVoltage\": "+ batteryVoltage + ','; // Add battery voltage to the message as a "BatteryVoltage" field
+  formattedMessage += "\"BatteryVoltage\": "+ test + ','; // Add battery voltage to the message as a "BatteryVoltage" field
   formattedMessage += "\"BatteryTemperature\": "+ batteryTemperature + ','; // Add battery temperature to the message as a "BatteryTemperature" field
   formattedMessage += "\"FurnacePressure\": "+ pressure + ','; // Add furnace pressure to the message as a "FurnacePressure" field
   formattedMessage += "\"FurnaceTemperature\": "+ temperature + ','; // Add furnace temperature to the message as a "FurnaceTemperature" field
