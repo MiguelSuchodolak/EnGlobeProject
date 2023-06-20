@@ -24,7 +24,7 @@ String readBatteryVoltage(){
     int rawValue = analogRead(BATTERY_VOLTAGE_PIN);
 
     // Convert the raw value to battery voltage using voltage divider calculation
-    float batteryVoltage = rawValue * (VCC/4095) * ( ( R2 + R1 ) / R2 );
+    float batteryVoltage = 1.2 * rawValue * (VCC/4095) * ( ( R2 + R1 ) / R2 );
 
     // Convert the battery voltage to a string and return it
     return String(batteryVoltage).c_str();

@@ -57,6 +57,8 @@ void loop() {
     String filename = "/"+ DateTimeFileName + ".txt";
 
     writeFile(SD,filename.c_str(),message.c_str());
+    Serial.print("Message from the sensors: ");
+    Serial.println(message.c_str());
     SendMqttMessage();
     FLAG_INTERRUPT = 0;
   }

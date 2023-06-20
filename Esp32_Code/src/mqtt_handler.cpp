@@ -5,6 +5,7 @@ const char* ssid = "Anna"; // Wi-Fi SSID
 const char* password = "anna11011"; // Wi-Fi password
 const char* mqtt_server = "192.168.238.219"; // MQTT broker server address
 const char* mqtt_topic = "esp32/1"; // MQTT topic
+int sending_data = 0;
 
 AsyncMqttClient mqttClient; // MQTT client instance
 TimerHandle_t mqttReconnectTimer; // Timer for MQTT reconnection
@@ -63,7 +64,6 @@ void onMqttPublish(uint16_t packetId) {
   filename = "/" + filename;
   deleteFile(SD, filename.c_str());
   SendMqttMessage();
-  
   xSemaphoreGive(mutex);
 }
 

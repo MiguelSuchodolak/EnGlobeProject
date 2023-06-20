@@ -14,7 +14,6 @@ extern const char* password; // Declaration of the Wi-Fi network password
 extern const char* mqtt_server; // Declaration of the MQTT broker server address
 extern const char* mqtt_topic; // Declaration of the MQTT topic
 extern SemaphoreHandle_t mutex;
-
 extern AsyncMqttClient mqttClient; // Declaration of the MQTT client object
 extern TimerHandle_t mqttReconnectTimer; // Declaration of the MQTT reconnect timer object
 extern TimerHandle_t wifiReconnectTimer; // Declaration of the Wi-Fi reconnect timer object
