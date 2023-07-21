@@ -41,27 +41,21 @@ def connect_mqtt(broker_id, client_id, broker, port):
     client.connect(broker, port)
     return client
 
-
 #Function responsible for detecting updates in certain topics
 #Every time the topic has an update and the local client receives a message 
 #the on_message function is called and the message received is forward 
 #to the broker
+client_termica = connect_mqtt("Termica Broker", client_id_RPI, TERMICA_BROKER, TERMICA_PORT) #connected with Termica broker
+client_termica.loop_start()
 
 def subscribe(client_local: mqtt_client):
     def on_message(client, userdata, msg):
         print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
-
-        client_termica = connect_mqtt("Termica Broker", client_id_RPI, TERMICA_BROKER, TERMICA_PORT) #connected with Termica broker
-        client_termica.loop_start()
-        result = client_termica.publish(topic= topic_termica, payload = msg.payload, qos=2) 
-        client_termica.loop(timeout=2)
+        result = client_termica.publish(topic= topic_termica, payload = msg.payload, qos=2)
         if result[0] == 0:
             print(f"Message published successfully to topic {topic_termica} on Termica Broker")
         else:
             print(f"Failed to publish message to topic {topic_termica} on Termica Broker")
-        client_termica.loop_stop()
-        client_termica.disconnect()  #Connects and disconnects every time new message arrives
-
     client_local.subscribe(topic_esp)
     client_local.subscribe(topic_plc)
     client_local.on_message = on_message
@@ -70,6 +64,6 @@ def run():
     client_local = connect_mqtt("Local Broker", client_id, LOCAL_BROKER, LOCAL_PORT)
     subscribe(client_local)
     client_local.loop_forever()
-
+    
 if __name__ == '__main__':
     run()
