@@ -1,5 +1,6 @@
 # This code publish data from the PLC to the local Broker running at the RPI 
 from datetime import datetime
+import json
 import asyncio 
 import logging
 from asyncua import Client
@@ -49,15 +50,19 @@ class SubHandler(object):
             temp = float(await self.nodes[2].get_value())
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            msg_pub = {"id" : "PLC/1",
-                      "temperature" : temp,
-                      "pressure" : pressure,
-                      "flow": flow,
-                      "timestamp": current_time
-                      }
+            msg_pub = {
+                "Id": "PLC1",
+                "FurnaceTemperature": temp,
+                "FurnacePressure" : pressure,
+                "Timestamp": str(current_time)
+            }
+            #payload = '{{"id":"{}", "temperature":{}, "pressure":{}, "flow":{}, "timestamp":"{}"}}'.format("PLC/1", temp, pressure, 1, current_time)
+            #msg_pub = "{\"Id\":" + "\"PLC1\"" + "," + "\"FurnaceTemperature\":" + str(temp) + "," + "\"FurnancePressure\":" + str(pressure) + "," + "\"Timestamp\":" + str(current_time) + "}"
+            pay = json.dumps(msg_pub)
 
-            result = client.publish(topic= topic_PLC_data, payload = str(msg_pub), qos=2) 
-            client.loop(timeout=2)
+            result = client.publish(topic= topic_PLC_data, payload = pay, qos=2) 
+           
+            client.loop(timeout=5)
 
             if result[0] == 0:
                 print(f"Message published successfully to topic on Local Broker")
@@ -72,7 +77,7 @@ class SubHandler(object):
 
 
 async def main():
-    url = "opc.tcp://192.168.239.206:53530/OPCUA/SimulationServer/" #Change IP according to the computer running the Simulator Prosys
+    url = "opc.tcp://192.168.131.206:53530/OPCUA/SimulationServer/" #Change IP according to the computer running the Simulator Prosys
     async with Client(url=url) as client:
         nsidx = await client.get_namespace_index("enGlobe_test")
         var_flow = await client.nodes.root.get_child(["0:Objects", f"{nsidx}:enGlobe_test","{}:{}".format(nsidx, "Flowmeter_sensor")])
